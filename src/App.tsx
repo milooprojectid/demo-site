@@ -1,15 +1,21 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import './App.css';
 import SentimentPage from './pages/Sentiment';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <SentimentPage name="archie" ></SentimentPage>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/sentiment">
+          <SentimentPage name="archie" />
+        </Route>
+        <Route path="/">
+          <h1>Home</h1>
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
