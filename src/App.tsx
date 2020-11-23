@@ -1,20 +1,46 @@
+import { Menu, Layout } from 'antd';
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-
 import './App.css';
+
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import SentimentPage from './pages/Sentiment';
+
+const { Header, Content } = Layout;
 
 function App() {
   return (
     <Router>
-      <Switch>
-        <Route path="/sentiment">
-          <SentimentPage name="archie" />
-        </Route>
-        <Route path="/">
-          <h1>Home</h1>
-        </Route>
-      </Switch>
+      <Layout className="layout">
+
+        <Header>
+          <div className="logo" />
+          <Menu theme="dark" mode="horizontal">
+            <Menu.Item>
+              <Link to="/">Home</Link>
+            </Menu.Item>
+            <Menu.Item key="2">
+              <Link to="/sentiment">Sentiment</Link>
+            </Menu.Item>
+          </Menu>
+        </Header>
+
+        <Content style={{ padding: '25px 25px' }}>
+          <div className="site-layout-content">
+            <Switch>
+              <Route path="/sentiment">
+                <SentimentPage />
+              </Route>
+              <Route path="/">
+                <h1>Home</h1>
+              </Route>
+            </Switch>
+          </div>
+        </Content>
+
+        {/* <Footer style={{ textAlign: 'center' }}>
+          Miloo Project 2020
+        </Footer> */}
+      </Layout>
     </Router>
   );
 }

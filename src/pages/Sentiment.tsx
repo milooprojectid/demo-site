@@ -1,9 +1,21 @@
+import { Button, Col, Input, Row, Space } from "antd";
 import React from "react";
 
-export const SentimentPage = (props: { name: string }) => {
+const { TextArea } = Input;
+
+export const SentimentPage = () => {
 
     return (
-        <h1>{props.name}</h1>
+        <Row>
+            <Col span={24} >            
+                <Space direction='vertical' style={{ 'width': "100%" }}>
+                    <TextArea rows={4} />
+                    <Button type="primary" block>
+                        Analyze
+                    </Button>
+                </Space>
+            </Col>
+        </Row>
     )
 }
 
