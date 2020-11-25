@@ -1,7 +1,7 @@
 import * as tfjs from "@tensorflow/tfjs";
 import { LayersModel, Tensor2D } from "@tensorflow/tfjs";
 
-type MapAny = { [key: string]: any };
+export type MapAny = { [key: string]: any };
 
 export class Tokenizer {
     private filters: RegExp;
@@ -117,7 +117,9 @@ export class Helper {
     }
 }
 
-export default {
+const module = {
     Tokenizer,
     Helper
-};
+}
+
+export default module;
