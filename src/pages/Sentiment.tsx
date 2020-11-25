@@ -1,28 +1,16 @@
+import { LayersModel, Tensor } from "@tensorflow/tfjs";
 import { Button, Col, Divider, Input, Row, Space, Table, Tag } from "antd";
 import React, { useEffect, useState } from "react";
+
+import { Helper, Tokenizer } from "../libs/nlp";
 
 const { TextArea } = Input;
 
 const DICTONARY: { [key: string]: { name: string, color: string } } = {
-    '-1': { name: "Negative", color: "red" },
-    '0': { name: "Neutral", color: "blue" },
-    '1': { name: "Positive", color: "green" }
+    '0': { name: "Negative", color: "red" },
+    '1': { name: "Neutral", color: "blue" },
+    '2': { name: "Positive", color: "green" }
 }
-
-const DUMMY_DATA = [
-    {
-      text: 'Barang ngga sesuai, ini toko penipu !',
-      class: -1
-    },
-    {
-      text: 'Kamu adalah manusia berang berang',
-      class: 0
-    },
-    {
-      text: 'Barang sesuai, cepat pula sampai nya, recommended pokoknya',
-      class: 1
-    },
-  ];
 
 const TABLE_COLUMN = [
     {
@@ -44,26 +32,52 @@ const TABLE_COLUMN = [
 
 interface Prediction { 
     text: string; 
-    class: number; 
+    class: number;
+    key: string;
 }
 
 export const SentimentPage = () => {
     const [prediction, setPrediction] = useState<Prediction[]>([]);
-    const [input, setInput] = useState<string>("kamu anjing");
+    const [input, setInput] = useState<string>("");
+    const [model, setModel] = useState<LayersModel | null>(null);
+    const [tokenizer, setTokenizer] = useState<Tokenizer | null>(null);
     
-    /** onload */
+    /** on first load */
     useEffect(() => {
-      // set animation
-      // load models
-        setPrediction(DUMMY_DATA);
+      loadModel();
+      loadTokenizer();
     }, []);
+
+    /** on all loaded */
+    useEffect(() => {
+      if (model && tokenizer) {
+        console.log("model loaded");
+      }
+    }, [model, tokenizer]);
+
+    const loadModel = async () => {
+      const model = await Helper.loadKerasModel("https://storage.googleapis.com/miloo/research/model/sentiment/model.json");
+      setModel(model);
+    }
+
+    const loadTokenizer = async () => {
+      const tokenizer = await Tokenizer.loadFromUrl("https://storage.googleapis.com/miloo/research/model/sentiment/token");
+      setTokenizer(tokenizer);
+    }
+
+    const predict = (text: string): number => {
+      const tokenized = tokenizer!.textsToSequences([text]);
+      const sequences = Helper.generatePadSequences(tokenized);
+      const prediction = (model!.predict(sequences) as Tensor).dataSync();
+      console.info(`PREDICTION ${prediction}`)
+      return Helper.getClass(prediction);
+    }
 
     /** call model */
     const onSubmit = (text: string) => {
-        // set animation
-        // prediction here
-        const predictionClass = -1;
-        setPrediction([...prediction, { text , class: predictionClass }]);
+        const predictionClass = predict(text);
+        setPrediction([...prediction, { text , class: predictionClass, key: Date.now().toString() }]);
+        setInput("");
     }
 
     return (
@@ -71,7 +85,7 @@ export const SentimentPage = () => {
             <Col span={24} >            
                 <Space direction='vertical' style={{ 'width': "100%" }}>
                     <TextArea rows={4} value={input} onChange={(e) => setInput(e.target.value)} />
-                    <Button type="primary" onClick={() => onSubmit(input)} block>
+                    <Button type="primary" onClick={() => input && onSubmit(input)} block>
                         Analyze
                     </Button >
                     <Divider />

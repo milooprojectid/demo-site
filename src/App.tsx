@@ -24,7 +24,7 @@ function App() {
           </Menu>
         </Header>
 
-        <Content style={{ padding: '25px 25px' }}>
+        <Content style={{ padding: '25px 25px', height: "calc(100vh - 50px)" }}>
           <div className="site-layout-content">
             <Switch>
               <Route path="/sentiment">
