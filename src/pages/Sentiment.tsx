@@ -53,11 +53,14 @@ export const SentimentPage = () => {
     
     /** onload */
     useEffect(() => {
+      // set animation
+      // load models
         setPrediction(DUMMY_DATA);
     }, []);
 
     /** call model */
     const onSubmit = (text: string) => {
+        // set animation
         // prediction here
         const predictionClass = -1;
         setPrediction([...prediction, { text , class: predictionClass }]);
