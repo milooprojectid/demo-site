@@ -116,10 +116,3 @@ export class Helper {
         return index;
     }
 }
-
-const module = {
-    Tokenizer,
-    Helper
-}
-
-export default module;

@@ -1,34 +1,16 @@
 import { LayersModel, Tensor } from "@tensorflow/tfjs";
-import { Button, Col, Divider, Input, Row, Space, Table, Tag } from "antd";
+import { Button, Card, Col, Divider, Input, Row, Space, List } from "antd";
 import React, { useEffect, useState } from "react";
-
+import { CheckCircleTwoTone, CloseCircleTwoTone, MinusCircleTwoTone } from '@ant-design/icons';
 import { Helper, Tokenizer } from "../libs/nlp";
 
 const { TextArea } = Input;
 
-const DICTONARY: { [key: string]: { name: string, color: string } } = {
-    '0': { name: "Negative", color: "red" },
-    '1': { name: "Neutral", color: "blue" },
-    '2': { name: "Positive", color: "green" }
+const ICON: { [key: string]: any } = {
+    '0': <CloseCircleTwoTone twoToneColor="#ec5858" />,
+    '1': <MinusCircleTwoTone twoToneColor="#aee6e6" />,
+    '2': <CheckCircleTwoTone twoToneColor="#52c41a" />
 }
-
-const TABLE_COLUMN = [
-    {
-      title: 'Text',
-      dataIndex: 'text',
-      key: 'text',
-      render: (value: string) => <p>{value}</p>,
-    },
-    {
-      title: 'Prediction',
-      dataIndex: 'class',
-      key: 'class',
-      render: (value: number) => {
-        const dict = DICTONARY[value.toString()];
-        return <Tag color={dict.color} key={value} >{ dict.name }</Tag>
-      },
-    }
-  ];
 
 interface Prediction { 
     text: string; 
@@ -37,7 +19,7 @@ interface Prediction {
 }
 
 export const SentimentPage = () => {
-    const [prediction, setPrediction] = useState<Prediction[]>([]);
+    const [predictions, setPredictions] = useState<Prediction[]>([]);
     const [input, setInput] = useState<string>("");
     const [model, setModel] = useState<LayersModel | null>(null);
     const [tokenizer, setTokenizer] = useState<Tokenizer | null>(null);
@@ -76,21 +58,45 @@ export const SentimentPage = () => {
     /** call model */
     const onSubmit = (text: string) => {
         const predictionClass = predict(text);
-        setPrediction([...prediction, { text , class: predictionClass, key: Date.now().toString() }]);
+        setPredictions([...predictions, { text , class: predictionClass, key: Date.now().toString() }]);
         setInput("");
+    }
+
+    const renderPrediction = (item: Prediction): any => {
+      const icon = ICON[item.class.toString()];
+      return (
+        <List.Item key={item.key}>
+          <List.Item.Meta
+            avatar={icon}
+            description={item.text}
+          />
+        </List.Item>
+      )
     }
 
     return (
         <Row>
-            <Col span={24} >            
+            <Col       
+                xl={{ span: 8, offset: 8 }}
+                lg={{ span: 10, offset: 7 }}
+                md={{ span: 12, offset: 6 }}
+                sm={{ span: 24 }}
+                xs={{ span: 24 }} >            
+            <Card>
                 <Space direction='vertical' style={{ 'width': "100%" }}>
                     <TextArea rows={4} value={input} onChange={(e) => setInput(e.target.value)} />
                     <Button type="primary" onClick={() => input && onSubmit(input)} block>
                         Analyze
                     </Button >
                     <Divider />
-                    <Table columns={TABLE_COLUMN} dataSource={prediction} pagination={false} />
+                    <List
+                        size="large"
+                        bordered
+                        dataSource={predictions}
+                        renderItem={renderPrediction}
+                    />
                 </Space>
+            </Card>
             </Col>
         </Row>
     )

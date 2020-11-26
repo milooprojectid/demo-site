@@ -25,7 +25,6 @@ function App() {
         </Header>
 
         <Content style={{ padding: '25px 25px', height: "calc(100vh - 50px)" }}>
-          <div className="site-layout-content">
             <Switch>
               <Route path="/sentiment">
                 <SentimentPage />
@@ -34,7 +33,6 @@ function App() {
                 <h1>Home</h1>
               </Route>
             </Switch>
-          </div>
         </Content>
 
         {/* <Footer style={{ textAlign: 'center' }}>
