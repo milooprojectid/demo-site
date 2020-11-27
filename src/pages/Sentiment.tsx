@@ -1,5 +1,5 @@
 import { LayersModel, Tensor } from "@tensorflow/tfjs";
-import { Button, Card, Col, Divider, Input, Row, Space, List } from "antd";
+import { Button, Card, Col, Divider, Input, Row, Space, List, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { CheckCircleTwoTone, CloseCircleTwoTone, MinusCircleTwoTone } from '@ant-design/icons';
 import { Helper, Tokenizer } from "../libs/nlp";
@@ -23,8 +23,11 @@ export const SentimentPage = () => {
     const [input, setInput] = useState<string>("");
     const [model, setModel] = useState<LayersModel | null>(null);
     const [tokenizer, setTokenizer] = useState<Tokenizer | null>(null);
+
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isPredicting, setIsPredicting] = useState<boolean>(false);
     
-    /** on first load */
+    /** on load only */
     useEffect(() => {
       loadModel();
       loadTokenizer();
@@ -34,16 +37,17 @@ export const SentimentPage = () => {
     useEffect(() => {
       if (model && tokenizer) {
         console.log("model loaded");
+        setIsLoading(false);
       }
     }, [model, tokenizer]);
 
     const loadModel = async () => {
-      const model = await Helper.loadKerasModel("https://storage.googleapis.com/miloo/research/model/sentiment/model.json");
+      const model = await Helper.loadKerasModel(`${process.env.REACT_APP_STORAGE_URL}/research/model/sentiment/model.json`);
       setModel(model);
     }
 
     const loadTokenizer = async () => {
-      const tokenizer = await Tokenizer.loadFromUrl("https://storage.googleapis.com/miloo/research/model/sentiment/token");
+      const tokenizer = await Tokenizer.loadFromUrl(`${process.env.REACT_APP_STORAGE_URL}/research/model/sentiment/token`);
       setTokenizer(tokenizer);
     }
 
@@ -56,10 +60,11 @@ export const SentimentPage = () => {
     }
 
     /** call model */
-    const onSubmit = (text: string) => {
-        const predictionClass = predict(text);
-        setPredictions([...predictions, { text , class: predictionClass, key: Date.now().toString() }]);
+    const onSubmit = () => {
+        setIsPredicting(true);
+        setPredictions([...predictions, { text: input , class: predict(input), key: Date.now().toString() }]);
         setInput("");
+        setIsPredicting(false);
     }
 
     const renderPrediction = (item: Prediction): any => {
@@ -76,17 +81,19 @@ export const SentimentPage = () => {
 
     return (
         <Row>
-            <Col       
+            <Col
                 xl={{ span: 8, offset: 8 }}
                 lg={{ span: 10, offset: 7 }}
                 md={{ span: 12, offset: 6 }}
                 sm={{ span: 24 }}
-                xs={{ span: 24 }} >            
+                xs={{ span: 24 }} >
             <Card>
                 <Space direction='vertical' style={{ 'width': "100%" }}>
-                    <TextArea rows={4} value={input} onChange={(e) => setInput(e.target.value)} />
-                    <Button type="primary" onClick={() => input && onSubmit(input)} block>
-                        Analyze
+                    <Spin spinning={isPredicting || isLoading}>
+                      <TextArea rows={4} value={input} onChange={(e) => setInput(e.target.value)} />
+                    </Spin>
+                    <Button disabled={input === ""} type="primary" onClick={onSubmit} block>
+                        { isLoading ? "Loading Model" : "Analyze" }
                     </Button >
                     <Divider />
                     <List

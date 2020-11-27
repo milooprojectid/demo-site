@@ -1,16 +1,17 @@
-import { Menu, Layout } from 'antd';
+import { Menu, Layout, Typography } from 'antd';
 import React from 'react';
 import './App.css';
 
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import SentimentPage from './pages/Sentiment';
 
-const { Header, Content } = Layout;
+const { Header, Content, Footer } = Layout;
+const { Text } = Typography;
 
 function App() {
   return (
     <Router>
-      <Layout className="layout">
+      <Layout className="layout" style={{ height:"100vh" }}>
 
         <Header>
           <div className="logo" />
@@ -24,7 +25,7 @@ function App() {
           </Menu>
         </Header>
 
-        <Content style={{ padding: '25px 25px', height: "calc(100vh - 50px)" }}>
+        <Content style={{ padding: '25px 25px' }}>
             <Switch>
               <Route path="/sentiment">
                 <SentimentPage />
@@ -35,9 +36,9 @@ function App() {
             </Switch>
         </Content>
 
-        {/* <Footer style={{ textAlign: 'center' }}>
-          Miloo Project 2020
-        </Footer> */}
+        <Footer style={{ textAlign: 'center' }}>
+          <Text type="secondary">Miloo Project 2020</Text>
+        </Footer>
       </Layout>
     </Router>
   );
